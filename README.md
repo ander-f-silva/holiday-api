@@ -14,12 +14,13 @@ The Holiday API is a Java-based application built using the Micronaut framework.
 - `src/test/resources`: Contains resource files needed for testing.
 - `pom.xml`: The Maven configuration file that specifies project dependencies, build configuration, and other settings.
 - `Dockerfile`: Contains instructions to build a Docker image for the application.
+- `docker-compose.yml`: Contains the configuration for Docker Compose to set up the application along with PostgreSQL and Redis services.
 
 ## Building the Project
 
 To build the project, use the following command:
 
-```
+```sh
 ./mvnw clean package
 ```
 
@@ -27,9 +28,15 @@ To build the project, use the following command:
 
 To run the application, you can use the Docker image built from the Dockerfile:
 
-```
+```sh
 docker build -t holiday-api .
 docker run -p 8080:8080 holiday-api
+```
+
+or
+
+```sh
+docker-compose up --build
 ```
 
 The application will be accessible at `http://localhost:8080`.
@@ -38,7 +45,8 @@ The application will be accessible at `http://localhost:8080`.
 
 To run the tests, use the following command:
 
-```
+```sh
+
 ./mvnw test
 ```
 
