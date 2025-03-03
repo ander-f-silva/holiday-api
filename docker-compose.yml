@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - MICRONAUT_DATASOURCE_URL=jdbc:postgresql://db:5432/holidaydb
+      - MICRONAUT_DATASOURCE_USERNAME=holidayuser
+      - MICRONAUT_DATASOURCE_PASSWORD=holidaypass
+      - MICRONAUT_CACHE_REDIS_HOST=redis
+      - MICRONAUT_CACHE_REDIS_PORT=6379
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: holidaydb
+      POSTGRES_USER: holidayuser
+      POSTGRES_PASSWORD: holidaypass
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
