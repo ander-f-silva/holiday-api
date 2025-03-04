@@ -46,7 +46,6 @@ The application will be accessible at `http://localhost:8080`.
 To run the tests, use the following command:
 
 ```sh
-
 ./mvnw test
 ```
 
