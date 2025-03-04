@@ -1,13 +1,12 @@
-FROM openjdk:21-jdk-slim AS build
+FROM amazoncorretto:21 AS build
 
 WORKDIR /app
 
-COPY pom.xml .
-COPY src ./src
+COPY . ./
 
 RUN ./mvnw clean package -DskipTests
 
-FROM openjdk:21-jre-slim
+FROM amazoncorretto:21
 
 WORKDIR /app
 
