@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: holidaydb
       POSTGRES_USER: holidayuser
-      POSTGRES_PASSWORD: holidaypass
+      POSTGRES_PASSWORD: holidaypass  
     ports:
       - "5432:5432"
 
