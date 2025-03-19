@@ -1,7 +1,7 @@
 package br.com.colossal.holiday.controller;
 
 import br.com.colossal.holiday.dto.HolidayResponse;
-import br.com.colossal.holiday.repository.HolidayOptionalRepository;
+import br.com.colossal.holiday.repository.HolidayRepository;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 @Tag(name = "Holiday Controller", description = "Controller for managing holidays")
@@ -23,10 +24,10 @@ import java.util.Optional;
 public class HolidayController {
 
     private static final Logger LOG = LoggerFactory.getLogger(HolidayController.class);
-    private final HolidayOptionalRepository holidayOptionalRepository;
+    private final HolidayRepository holidayRepository;
 
-    public HolidayController(HolidayOptionalRepository holidayOptionalRepository) {
-        this.holidayOptionalRepository = holidayOptionalRepository;
+    public HolidayController(HolidayRepository holidayRepository) {
+        this.holidayRepository = holidayRepository;
     }
 
     @Operation(summary = "Get holiday by ID and date", description = "Returns a holiday based on the provided ID and date")
@@ -34,15 +35,22 @@ public class HolidayController {
             @ApiResponse(responseCode = "200", description = "Holiday found"),
             @ApiResponse(responseCode = "404", description = "Holiday not found")
     })
-    @Get("/{holidayId}/{date}")
+    @Get("/{territoryId}/{date}")
     public HttpResponse<HolidayResponse> getHoliday(
-            @Parameter(description = "ID of the holiday") Long holidayId,
+            @Parameter(description = "ID of the holiday") Long territoryId,
             @Parameter(description = "Date of the holiday in YYYY-MM-DD format") String date) {
-        LOG.info("Fetching holiday with ID: {} and date: {}", holidayId, date);
-        LocalDate localDate = LocalDate.parse(date);
-        Optional<HolidayResponse> holidayResponse = holidayOptionalRepository.findHolidayResponseByHolidayIdAndCreatedAt(holidayId, localDate);
+        LOG.info("Fetching holiday with ID: {} and date: {}", territoryId, date);
 
-        return holidayResponse.map(HttpResponse::ok)
-                .orElseGet(HttpResponse::notFound);
+        try {
+            LocalDate localDate = LocalDate.parse(date);
+            Optional<String> holidayResponse = holidayRepository.findHolidayNameByTerritoryIdPrefixAndDate(
+                    String.valueOf(territoryId), localDate.getDayOfMonth(), localDate.getMonthValue(), localDate.getYear());
+
+            return holidayResponse.map(name -> HttpResponse.ok(new HolidayResponse(name)))
+                    .orElseGet(HttpResponse::notFound);
+        } catch (DateTimeParseException e) {
+            LOG.error("Invalid date format: {}", date, e);
+            return HttpResponse.badRequest();
+        }
     }
 }
