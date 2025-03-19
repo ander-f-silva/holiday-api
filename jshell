@@ -1,0 +1,49 @@
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+    String secret = "pleaseChangeThisSecretForANewOne";
+
+    String header = Base64.getUrlEncoder().withoutPadding().encodeToString("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".getBytes());
+
+    Map payload = new HashMap<String, Object>();
+
+    payload.put("sub", "1234567890");
+    payload.put("name", "John Doe");
+    payload.put("admin", true);
+    payload.put("exp", new Date(System.currentTimeMillis() + 3600000).getTime() / 1000);
+
+    String payloadJson = new StringBuilder()
+            .append("{")
+            .append("\"sub\":\"").append(payload.get("sub")).append("\",")
+            .append("\"name\":\"").append(payload.get("name")).append("\",")
+            .append("\"admin\":").append(payload.get("admin")).append(",")
+            .append("\"exp\":").append(payload.get("exp"))
+            .append("}")
+            .toString();
+
+    String payloadBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString(payloadJson.getBytes());
+
+    String tokenWithoutSignature = header + "." + payloadBase64;
+
+    static String generateHMACSHA256Signature(String data, String secret) {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
+            mac.init(secretKeySpec);
+            byte[] rawHmac = mac.doFinal(data.getBytes());
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(rawHmac);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar a assinatura HMACSHA256", e);
+        }
+    }
+
+    // Call the method to generate the signature
+    String signature = generateHMACSHA256Signature(tokenWithoutSignature, secret);
+
+    String token = tokenWithoutSignature + "." + signature;
+
+    System.out.println("Token JWT: " + token);
