@@ -1,4 +1,3 @@
-// Territory.java
 package br.com.colossal.holiday.entity;
 
 import io.micronaut.data.annotation.Id;

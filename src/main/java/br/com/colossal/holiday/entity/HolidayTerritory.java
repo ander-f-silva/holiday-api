@@ -5,6 +5,7 @@ import io.micronaut.data.model.naming.NamingStrategies;
 
 @MappedEntity(value = "tb_holiday_territory", namingStrategy = NamingStrategies.Raw.class)
 public record HolidayTerritory(
-    Long holidayId,
-    Long territoryId
-) {}
+        Long holidayId,
+        Long territoryId
+) {
+}
