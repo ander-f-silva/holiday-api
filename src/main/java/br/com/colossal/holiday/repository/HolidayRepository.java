@@ -23,12 +23,12 @@ public interface HolidayRepository extends CrudRepository<Holiday, Long> {
     @Query("SELECT h.name FROM tb_holiday h " +
             "JOIN tb_holiday_territory ht ON h.id = ht.holiday_id " +
             "JOIN tb_territory t ON ht.territory_id = t.id " +
-            "WHERE t.id = :textTerritoryId " +
+            "WHERE t.id = :territoryId " +
             "AND h.day = :day " +
             "AND h.month = :month " +
             "AND h.year = :year " +
             "LIMIT 1")
-    Optional<String> findHolidayNameByTerritoryIdAndDate(String textTerritoryId, int day, int month, int year);
+    Optional<String> findHolidayNameByTerritoryIdAndDate(Integer territoryId, int day, int month, int year);
 
     @Query("SELECT h.name FROM tb_holiday h " +
             "WHERE h.day = :day " +

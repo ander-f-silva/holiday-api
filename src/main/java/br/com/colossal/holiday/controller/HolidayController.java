@@ -38,7 +38,7 @@ public class HolidayController {
             @Parameter(description = "Date of the holiday in YYYY-MM-DD format")
             @Format("yyyy-MM-dd") LocalDate date) {
 
-        var holidayName = findHoliday.findHolidayName(territoryId, date);
+        var holidayName = findHoliday.getHolidayName(territoryId, date);
 
         return holidayName.map(name -> HttpResponse.ok(new HolidayResponse(name)))
                 .orElseGet(HttpResponse::notFound);

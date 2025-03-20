@@ -19,25 +19,52 @@ public class FindHoliday {
         this.holidayRepository = holidayRepository;
     }
 
-    @Cacheable("holiday-name")
-    public Optional<String> findHolidayName(Integer territoryId, LocalDate date) {
-        LOG.info("Fetching holiday with ID: {} and date: {}", territoryId, date);
+    @Cacheable("holidays")
+    public Optional<String> getHolidayName(Integer territoryId, LocalDate date) {
+        Optional<String> holidayName = findHolidayNational(date);
 
-        var textTerritoryId = territoryId.toString();
+        if (holidayName.isEmpty()) {
+            var textTerritoryId = territoryId.toString();
+
+            if (isCodeState(textTerritoryId))
+                holidayName = findHolidayState(textTerritoryId, date);
+            else
+                holidayName = findHolidayCity(territoryId, date);
+        }
+
+        return holidayName;
+    }
+
+    private Optional<String> findHolidayNational(LocalDate date) {
+        LOG.info("Fetching holiday national with date: {}", date);
+
+        int dayOfMonth = date.getDayOfMonth();
+        int monthValue = date.getMonthValue();
+
+        return holidayRepository.findHolidayNameByDayAndMoth(dayOfMonth, monthValue);
+    }
+
+    private Optional<String> findHolidayState(String textTerritoryId, LocalDate date) {
+        LOG.info("Fetching state holiday with ID: {} and date: {}", textTerritoryId, date);
+
         int dayOfMonth = date.getDayOfMonth();
         int monthValue = date.getMonthValue();
         int year = date.getYear();
 
-        Optional<String> holidayName = holidayRepository.findHolidayNameByDayAndMoth(dayOfMonth, monthValue);
+        return holidayRepository.findHolidayNameByTerritoryIdPrefixAndDate(textTerritoryId, dayOfMonth, monthValue, year);
+    }
 
-        if (holidayName.isEmpty()) {
-            if (textTerritoryId.length() < 3) {
-                holidayName = holidayRepository.findHolidayNameByTerritoryIdPrefixAndDate(textTerritoryId, dayOfMonth, monthValue, year);
-            } else {
-                holidayName = holidayRepository.findHolidayNameByTerritoryIdAndDate(textTerritoryId, dayOfMonth, monthValue, year);
-            }
-        }
+    public Optional<String> findHolidayCity(Integer territoryId, LocalDate date) {
+        LOG.info("Fetching city holiday with ID: {} and date: {}", territoryId, date);
 
-        return holidayName;
+        int dayOfMonth = date.getDayOfMonth();
+        int monthValue = date.getMonthValue();
+        int year = date.getYear();
+
+        return holidayRepository.findHolidayNameByTerritoryIdAndDate(territoryId, dayOfMonth, monthValue, year);
+    }
+
+    private boolean isCodeState(String textTerritoryId) {
+        return textTerritoryId.length() < 3;
     }
 }
