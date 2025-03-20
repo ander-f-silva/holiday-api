@@ -28,11 +28,10 @@ public interface HolidayRepository extends CrudRepository<Holiday, Long> {
             "AND h.month = :month " +
             "AND h.year = :year " +
             "LIMIT 1")
-    Optional<String> findHolidayNameByTerritoryIdAndDate(String textTerritoryId, int dayOfMonth, int monthValue, int year);
+    Optional<String> findHolidayNameByTerritoryIdAndDate(String textTerritoryId, int day, int month, int year);
 
     @Query("SELECT h.name FROM tb_holiday h " +
             "WHERE h.day = :day " +
-            "AND h.month = :month " +
-            "AND h.year = :year")
-    Optional<String> findHolidayNameByDate(int dayOfMonth, int monthValue, int year);
+            "AND h.month = :month")
+    Optional<String> findHolidayNameByDayAndMoth(int day, int month);
 }
